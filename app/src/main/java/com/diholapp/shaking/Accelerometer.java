@@ -75,7 +75,7 @@ public class Accelerometer implements SensorEventListener {
     private boolean mustTriggerEvent(SensorEvent sensorEvent, double tempMs){
 
         double totalValue = abs(sensorEvent.values[0]) + abs(sensorEvent.values[1]) + abs(sensorEvent.values[2]);
-        return totalValue > 20 && (tempMs - lastTrigger >= intervalTrigger);
+        return totalValue > delegate.getSensibility() && (tempMs - lastTrigger >= intervalTrigger);
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

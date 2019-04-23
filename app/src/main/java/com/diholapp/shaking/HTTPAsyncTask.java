@@ -18,6 +18,7 @@ import java.net.URL;
 public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
     private Shaking delegate = null;
+    private final String url = "https://diholapplication.com/bump-php/connect";
 
     public HTTPAsyncTask(Shaking delegate){
         this.delegate = delegate;
@@ -28,7 +29,7 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
         try {
             try {
-                return HttpPost("https://diholapplication.com/bump-php/connect");
+                return HttpPost(url);
             } catch (JSONException e) {
                 e.printStackTrace();
                 return "Error!";

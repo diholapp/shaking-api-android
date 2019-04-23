@@ -1,10 +1,12 @@
 package com.diholapp.shaking;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 
@@ -24,6 +26,7 @@ public class Shaking implements AsyncResponse {
     private double maxTimeSearch;
     private double refreshInterval;
     private double distanceFilter;
+    private double sensibility;
 
     private boolean keepSearching;
 
@@ -44,6 +47,7 @@ public class Shaking implements AsyncResponse {
         this.maxTimeSearch = 2;
         this.distanceFilter = 100;
         this.refreshInterval = 0.25;
+        this.sensibility = 20;
         this.keepSearching = false;
 
         this.mAccelerometer = new Accelerometer(this);
@@ -51,19 +55,26 @@ public class Shaking implements AsyncResponse {
         configLocationListener();
     }
 
-    public void start(){
+    public Shaking start(){
 
         // Register the listener with the Location Manager to receive location updates
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+        if(checkLocationPermission()){
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+        }
+        else {
 
+        }
+
+        return this;
     }
 
-    public void stop(){
+    public Shaking stop(){
         mLocationManager.removeUpdates(mLocationListener);
+        return this;
     }
 
     public void simulate(){
-
+        new HTTPAsyncTask(this).execute();
     }
 
     @Override
@@ -78,22 +89,37 @@ public class Shaking implements AsyncResponse {
         Log.i("a ver...", output);
     }
 
+    private boolean checkLocationPermission(){
+        return (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED);
+    }
+
     private void configLocationListener(){
 
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-        Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(checkLocationPermission()){
+            Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        if(lastKnownLocation != null){
-            setLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            if(lastKnownLocation != null){
+                setLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            }
+        }
+        else {
+
         }
 
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
 
-                Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                Location bestLocation = GPSLocation.getBestLocation(location, lastKnownLocation);
-                setLocation(bestLocation.getLatitude(), bestLocation.getLongitude());
+                if(checkLocationPermission()){
+                    Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    Location bestLocation = GPSLocation.getBestLocation(location, lastKnownLocation);
+                    setLocation(bestLocation.getLatitude(), bestLocation.getLongitude());
+                }
+                else {
+
+                }
 
             }
 
@@ -179,6 +205,15 @@ public class Shaking implements AsyncResponse {
 
     public boolean getKeepSearching(){
         return keepSearching;
+    }
+
+    public Shaking setSensibility(double sensibility){
+        this.sensibility = sensibility;
+        return this;
+    }
+
+    public double getSensibility(){
+        return sensibility;
     }
 
 }
