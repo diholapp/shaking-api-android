@@ -33,4 +33,8 @@ public class ShakingIntents {
     /* Broadcast when the server is not available.
      */
     public static final String SERVER_ERROR = "com.diholapp.shaking.serverError";
+
+    /* Broadcast when the device sensors are not available.
+     */
+    public static final String SENSOR_ERROR = "com.diholapp.shaking.sensorError";
 }

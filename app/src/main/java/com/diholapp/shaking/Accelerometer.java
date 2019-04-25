@@ -5,8 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import static java.lang.Math.abs;
 
@@ -23,9 +21,9 @@ public class Accelerometer implements SensorEventListener {
     private final Sensor sensor;
     private final SensorManager sensorManager;
 
-    private Shaking delegate = null;
+    private ShakingAPI delegate;
 
-    public Accelerometer(Shaking delegate) {
+    public Accelerometer(ShakingAPI delegate) {
         lastTrigger = 0;
         //interval = 2000;
         intervalTrigger = 2000;
@@ -34,19 +32,14 @@ public class Accelerometer implements SensorEventListener {
         sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        if (sensor != null) {
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-        } else {
-            Log.e("Compass MainActivity", "NOT Registerered ACCELEROMETER");
-            Toast.makeText(mContext, "ORIENTATION Sensor not found", Toast.LENGTH_LONG).show();
-            //finish();
-        }
-
     }
 
     public void startUpdates(){
         if (sensor != null) {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        else {
+            delegate.sendBroadcast(ShakingIntents.SENSOR_ERROR);
         }
     }
 

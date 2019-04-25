@@ -17,6 +17,11 @@ public class GPSLocation {
             return location;
         }
 
+        if (location == null) {
+            // Avoids fatal crash
+            return currentBestLocation;
+        }
+
         // Check whether the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
         boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;

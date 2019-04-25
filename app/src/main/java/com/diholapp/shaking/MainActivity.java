@@ -6,32 +6,45 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private Shaking api;
+    private ShakingAPI api;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             final String action = intent.getAction();
+
             switch (action){
                 case ShakingIntents.SHAKING:
+                    Log.i("HH2", "SHAKED");
                     break;
                 case ShakingIntents.MATCHED:
+                    ArrayList<String> result = intent.getStringArrayListExtra("result");
                     break;
                 case ShakingIntents.NOT_MATCHED:
+                    Log.i("HH2", "NOT_MATCHED");
                     break;
                 case ShakingIntents.LOCATION_PERMISSION_ERROR:
+                    Log.i("HH2", "LOCATION_PERMISSION_ERROR");
                     break;
                 case ShakingIntents.AUTHENTICATION_ERROR:
+                    Log.i("HH2", "AUTHENTICATION_ERROR");
                     break;
                 case ShakingIntents.API_KEY_EXPIRED:
+                    Log.i("HH2", "API_KEY_EXPIRED");
                     break;
                 case ShakingIntents.TIMEOUT:
+                    Log.i("HH2", "TIMEOUT");
                     break;
                 case ShakingIntents.SERVER_ERROR:
+                    Log.i("HH2", "SERVER_ERROR");
                     break;
             }
         }
@@ -53,14 +66,23 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(ShakingIntents.SERVER_ERROR);
         registerReceiver(receiver, filter);
 
-        api = new Shaking("1", "qwerty", this);
+        api = new ShakingAPI("1", "qwerty", this);
         api.start();
 
-        //ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
-        //                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 3456);
+        //ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 3456);
     }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        api.start();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        api.stop();
+    }
 
 }

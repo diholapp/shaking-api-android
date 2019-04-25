@@ -1,6 +1,7 @@
 package com.diholapp.shaking;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,14 +14,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
-    private Shaking delegate = null;
+    private ShakingAPI delegate;
     private final String url = "https://diholapplication.com/bump-php/connect";
 
-    public HTTPAsyncTask(Shaking delegate){
+    public HTTPAsyncTask(ShakingAPI delegate){
         this.delegate = delegate;
     }
 
@@ -28,15 +30,20 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... urls) {
 
         try {
-            try {
-                return HttpPost(url);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return "Error!";
-            }
-        } catch (IOException e) {
-            return "Unable to retrieve web page. URL may be invalid.";
+            return HttpPost(url);
         }
+        catch (SocketTimeoutException e) {
+            // TODO: Fix this, never thrown
+            delegate.sendBroadcast(ShakingIntents.TIMEOUT);
+        }
+        catch (IOException e) {
+            //delegate.sendBroadcast(ShakingIntents.SERVER_ERROR);
+        }
+        catch (JSONException e) {
+            //delegate.sendBroadcast(ShakingIntents.SERVER_ERROR);
+        }
+
+        return "";
     }
 
     // onPostExecute displays the results of the AsyncTask.
