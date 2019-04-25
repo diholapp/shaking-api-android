@@ -1,7 +1,6 @@
-package com.diholapp.shaking;
+package com.diholapp.android.shaking;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +52,6 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
     }
 
     private String HttpPost(String myUrl) throws IOException, JSONException {
-        String result = "";
 
         URL url = new URL(myUrl);
 
@@ -63,7 +61,7 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
         // 2. build JSON object
-        JSONObject jsonObject = buidJsonObject();
+        JSONObject jsonObject = buildJsonObject();
 
         // 3. add JSON content to POST request body
         setPostRequestContent(conn, jsonObject);
@@ -71,11 +69,10 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         // 4. make POST request to the given URL
         conn.connect();
 
+        // 5. return response message
         InputStream in = new BufferedInputStream(conn.getInputStream());
 
-        // 5. return response message
         return readStream(in);
-
     }
 
     private String readStream(InputStream is) {
@@ -92,7 +89,7 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    private JSONObject buidJsonObject() throws JSONException {
+    private JSONObject buildJsonObject() throws JSONException {
 
         JSONObject jsonObject = new JSONObject();
 

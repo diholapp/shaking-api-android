@@ -1,4 +1,4 @@
-package com.diholapp.shaking;
+package com.diholapp.android.shaking;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,10 +8,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
-import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.util.ArrayList;
@@ -38,10 +37,10 @@ public class ShakingAPI implements AsyncResponse {
 
     private final Context mContext;
 
+    private Accelerometer mAccelerometer;
+
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
-
-    private Accelerometer mAccelerometer;
 
     private boolean running = false;
 
@@ -82,15 +81,15 @@ public class ShakingAPI implements AsyncResponse {
         new HTTPAsyncTask(this).execute();
     }
 
+    public void sendBroadcast(String s) {
+        mContext.sendBroadcast(new Intent(s));
+    }
+
     @Override
     public void onShakingEvent(){
 
         sendBroadcast(ShakingIntents.SHAKING);
         new HTTPAsyncTask(this).execute();
-    }
-
-    public void sendBroadcast(String s) {
-        mContext.sendBroadcast(new Intent(s));
     }
 
     @Override

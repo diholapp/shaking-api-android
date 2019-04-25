@@ -1,7 +1,6 @@
-package com.diholapp.shaking;
+package com.diholapp.android.shaking;
 
 import android.location.Location;
-import android.location.LocationManager;
 
 public class GPSLocation {
 

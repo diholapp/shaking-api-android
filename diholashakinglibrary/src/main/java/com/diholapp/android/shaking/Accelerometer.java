@@ -1,4 +1,4 @@
-package com.diholapp.shaking;
+package com.diholapp.android.shaking;
 
 import android.content.Context;
 import android.hardware.Sensor;

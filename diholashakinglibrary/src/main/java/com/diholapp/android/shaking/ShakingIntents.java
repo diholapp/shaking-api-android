@@ -1,4 +1,4 @@
-package com.diholapp.shaking;
+package com.diholapp.android.shaking;
 
 public class ShakingIntents {
 

@@ -4,12 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import java.util.ArrayList;
+import com.diholapp.android.shaking.ShakingAPI;
+import com.diholapp.android.shaking.ShakingIntents;
 
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("HH2", "NOT_MATCHED");
                     break;
                 case ShakingIntents.LOCATION_PERMISSION_ERROR:
+                    askPermmission();
                     Log.i("HH2", "LOCATION_PERMISSION_ERROR");
                     break;
                 case ShakingIntents.AUTHENTICATION_ERROR:
@@ -49,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void askPermmission(){
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 3456);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
