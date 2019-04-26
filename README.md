@@ -42,6 +42,7 @@ ShakingAPI api = new ShakingAPI(USER_ID, API_KEY, this).start();
 ```
 
 **Parameters:**
+
 | Name       | Type       | Description                  |
 | -----------| -----------| -----------------------------|
 | USER_ID    | String     | User identifier              |
@@ -151,7 +152,7 @@ Sets the sensibility for the shaking event to be triggered.
 
 | Name        | Type     | Default|
 | ----------- | -------- | -------- |
-| sensibility| double     | 20      |
+| sensibility| double     | 25      |
 
 ---
 
@@ -168,7 +169,7 @@ Sets the maximum distance (in meters) between two devices to be eligible for pai
 
 | Name        | Type     | Default| Note|
 | ----------- | -------- | -------- | ----------------------------------------- |
-| distanceFilter| double     | 100  | GPS margin error must be taken into account        |
+| distanceFilter| int     | 100  | GPS margin error must be taken into account        |
 
 ---
 
@@ -179,13 +180,13 @@ Sets the maximum distance (in meters) between two devices to be eligible for pai
 api.setTimingFilter(timingFilter);
 ```
 
-Sets the maximum time difference (in seconds) between two shaking events to be eligible for pairing.
+Sets the maximum time difference (in milliseconds) between two shaking events to be eligible for pairing.
 
 **Parameters:**
 
 | Name        | Type     | Default|
 | ----------- | -------- | -------- |
-| timingFilter| double   | 2 |
+| timingFilter| int   | 2000 |
 
 ---
 
@@ -212,13 +213,13 @@ A positive value would allow to keep searching even though if a user has been fo
 api.setMaxTimeSearch(maxTimeSearch);
 ```
 
-Sets the maximum time the server will be searching. This value can affect the response time.
+Sets the maximum time the server will be searching (in milliseconds). This value can affect the response time.
 
 **Parameters:**
 
 | Name        | Type     | Default| Description                               |
 | ----------- | -------- | -------- | ----------------------------------------- |
-| maxTimeSearch| double     | 2      | Value between 1 and 20        |
+| maxTimeSearch| int     | 2000      | Value between 100 and 10000        |
 
 ---
 
@@ -228,13 +229,13 @@ Sets the maximum time the server will be searching. This value can affect the re
 api.setRefreshInterval(refreshInterval);
 ```
 
-Sets the refresh interval for the pairing algorithm. Greater values would allow to pair with multiple devices when keepSearching is disabled.
+Sets the refresh interval for the pairing algorithm (in milliseconds). Greater values would allow to pair with multiple devices when keepSearching is disabled.
 
 **Parameters:**
 
 | Name        | Type     | Default| Description                               |
 | ----------- | -------- | -------- | ----------------------------------------- |
-| refreshInterval| double     | 0.25      | Value between 0.1 and maxTimeSearch        |
+| refreshInterval| int     | 250      | Value between 100 and maxTimeSearch        |
 
 ---
 
