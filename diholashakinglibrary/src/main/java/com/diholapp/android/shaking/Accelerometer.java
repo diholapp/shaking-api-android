@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import static java.lang.Math.abs;
 
@@ -12,11 +13,9 @@ public class Accelerometer implements SensorEventListener {
 
     private final Context mContext;
 
-    private int interval;
-    private int intervalTrigger;
+    private final int interval = 100;
 
     private double lastReading = (double) System.currentTimeMillis();
-    private double lastTrigger;
 
     private final Sensor sensor;
     private final SensorManager sensorManager;
@@ -24,9 +23,7 @@ public class Accelerometer implements SensorEventListener {
     private ShakingAPI delegate;
 
     public Accelerometer(ShakingAPI delegate) {
-        lastTrigger = 0;
-        //interval = 2000;
-        intervalTrigger = 2000;
+
         this.delegate = delegate;
         mContext = delegate.getContext();
         sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
@@ -47,10 +44,6 @@ public class Accelerometer implements SensorEventListener {
         sensorManager.unregisterListener(this);
     }
 
-    public void setUpdateInterval(int newInterval) {
-        this.interval = newInterval;
-    }
-
     @Override
     public void onSensorChanged(SensorEvent sensorEvent){
         double tempMs = (double) System.currentTimeMillis();
@@ -58,7 +51,6 @@ public class Accelerometer implements SensorEventListener {
             lastReading = tempMs;
 
             if(mustTriggerEvent(sensorEvent, tempMs)){
-                lastTrigger = tempMs;
                 delegate.onShakingEvent();
             }
         }
@@ -68,7 +60,7 @@ public class Accelerometer implements SensorEventListener {
     private boolean mustTriggerEvent(SensorEvent sensorEvent, double tempMs){
 
         double totalValue = abs(sensorEvent.values[0]) + abs(sensorEvent.values[1]) + abs(sensorEvent.values[2]);
-        return totalValue > delegate.getSensibility() && (tempMs - lastTrigger >= intervalTrigger);
+        return totalValue > delegate.getSensibility();
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

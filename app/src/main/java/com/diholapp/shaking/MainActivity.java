@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(ShakingIntents.SERVER_ERROR);
         registerReceiver(receiver, filter);
 
-        api = new ShakingAPI("1", "qwerty", this);
+        api = new ShakingAPI("1", "qwerty", this).setMaxTimeSearch(2000);
         api.start();
 
         //ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 3456);

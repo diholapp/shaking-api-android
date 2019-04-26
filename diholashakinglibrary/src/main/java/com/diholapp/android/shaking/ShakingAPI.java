@@ -27,11 +27,11 @@ public class ShakingAPI implements AsyncResponse {
     private double lat;
     private double lng;
 
-    private double timingFilter = 2;
-    private double maxTimeSearch = 2;
-    private double refreshInterval = 0.25;
-    private double distanceFilter = 100;
-    private double sensibility = 20;
+    private double sensibility = 25;
+    private int distanceFilter = 100;
+    private int timingFilter = 2000;
+    private int maxTimeSearch = 2000;
+    private int refreshInterval = 250;
 
     private boolean keepSearching = false;
 
@@ -42,7 +42,10 @@ public class ShakingAPI implements AsyncResponse {
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
 
+    private boolean stopped = true;
     private boolean running = false;
+    private boolean processing = false;
+    private boolean manualLocation = false;
 
     public ShakingAPI(String user, String API_KEY, Context context){
 
@@ -57,9 +60,10 @@ public class ShakingAPI implements AsyncResponse {
 
     public ShakingAPI start(){
 
-        if(!running){
+        if(stopped && !processing){
+            stopped = false;
             running = true;
-            registerLocationListener();
+            if(!manualLocation) registerLocationListener();
             mAccelerometer.startUpdates();
         }
 
@@ -68,13 +72,33 @@ public class ShakingAPI implements AsyncResponse {
 
     public ShakingAPI stop(){
 
-        if(running){
+        if(!stopped){
+            stopped = true;
             running = false;
             unregisterLocationListener();
             mAccelerometer.stopUpdates();
         }
 
         return this;
+    }
+
+    private void restart(){
+
+        if(!stopped && !processing){
+            running = true;
+            if(!manualLocation) registerLocationListener();
+            mAccelerometer.startUpdates();
+        }
+
+    }
+
+    private void pause(){
+
+        if(running){
+            running = false;
+            unregisterLocationListener();
+            mAccelerometer.stopUpdates();
+        }
     }
 
     public void simulate(){
@@ -87,6 +111,9 @@ public class ShakingAPI implements AsyncResponse {
 
     @Override
     public void onShakingEvent(){
+
+        processing = true;
+        pause();
 
         sendBroadcast(ShakingIntents.SHAKING);
         new HTTPAsyncTask(this).execute();
@@ -123,6 +150,8 @@ public class ShakingAPI implements AsyncResponse {
         }
 
         mContext.sendBroadcast(intent);
+        processing = false;
+        restart();
     }
 
     private ArrayList<String> processJsonResponse(String jsonString) throws Exception{
@@ -180,7 +209,7 @@ public class ShakingAPI implements AsyncResponse {
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         if(checkLocationPermission()){
-            setLocation(getLastKnownLocation());
+            updateLocation(getLastKnownLocation());
         }
 
         mLocationListener = new LocationListener() {
@@ -188,7 +217,7 @@ public class ShakingAPI implements AsyncResponse {
             public void onLocationChanged(Location location) {
 
                 Location bestLocation = GPSLocation.getBestLocation(location,  getLastKnownLocation());
-                setLocation(bestLocation);
+                updateLocation(bestLocation);
 
             }
 
@@ -232,13 +261,27 @@ public class ShakingAPI implements AsyncResponse {
         return lng;
     }
 
-    public void setLocation(double lat, double lng){
+    public ShakingAPI setLocation(double lat, double lng){
         this.lat = lat;
         this.lng = lng;
+        manualLocation = true;
+
+        return this;
     }
 
-    public void setLocation(Location location){
+    public ShakingAPI setLocation(Location location){
         if(location != null) {
+            this.lat = location.getLatitude();
+            this.lng = location.getLongitude();
+        }
+        manualLocation = true;
+
+        return this;
+    }
+
+
+    public void updateLocation(Location location){
+        if(!manualLocation && location != null) {
             this.lat = location.getLatitude();
             this.lng = location.getLongitude();
         }
@@ -257,39 +300,39 @@ public class ShakingAPI implements AsyncResponse {
         return user;
     }
 
-    public ShakingAPI setTimingFilter(double timingFilter){
+    public ShakingAPI setTimingFilter(int timingFilter){
         this.timingFilter = timingFilter;
         return this;
     }
 
-    public double getTimingFilter(){
+    public int getTimingFilter(){
         return timingFilter;
     }
 
-    public ShakingAPI setMaxTimeSearch(double maxTimeSearch){
+    public ShakingAPI setMaxTimeSearch(int maxTimeSearch){
         this.maxTimeSearch = maxTimeSearch;
         return this;
     }
 
-    public double getMaxTimeSearch(){
+    public int getMaxTimeSearch(){
         return maxTimeSearch;
     }
 
-    public ShakingAPI setRefreshInterval(double refreshInterval){
+    public ShakingAPI setRefreshInterval(int refreshInterval){
         this.refreshInterval = refreshInterval;
         return this;
     }
 
-    public double getRefreshInterval(){
+    public int getRefreshInterval(){
         return refreshInterval;
     }
 
-    public ShakingAPI setDistanceFilter(double distanceFilter){
+    public ShakingAPI setDistanceFilter(int distanceFilter){
         this.distanceFilter = distanceFilter;
         return this;
     }
 
-    public double getDistanceFilter(){
+    public int getDistanceFilter(){
         return distanceFilter;
     }
 
