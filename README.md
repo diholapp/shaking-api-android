@@ -37,16 +37,16 @@ import com.diholapp.android.shaking.ShakingIntents;
 Usage
 -------
 
-```
+```java
 ShakingAPI api = new ShakingAPI(USER_ID, API_KEY, this).start();
 ```
 
 **Parameters:**
-| Name       | Type       | Description  |
-| -----------| --------   | -------- |
-| USER_ID    | String     | User identifier |
+| Name       | Type       | Description                  |
+| -----------| -----------| -----------------------------|
+| USER_ID    | String     | User identifier              |
 | API_KEY    | String     | Get one at www.diholapp.com  |
-| context    | Context    | Activity context |
+| context    | Context    | Activity context             |
 
 Set up your BroadcastReceiver
 ------------
@@ -119,7 +119,7 @@ Methods
 
 #### `start()`
 
-```
+```java
 api.start();
 ```
 
@@ -130,7 +130,7 @@ Starts listening to shaking events.
 
 #### `stop()`
 
-```
+```java
 api.stop();
 ```
 
@@ -141,7 +141,7 @@ Stops listening to shaking events.
 
 #### `setSensibility()`
 
-```
+```java
 api.setSensibility(sensibility);
 ```
 
@@ -158,7 +158,7 @@ Sets the sensibility for the shaking event to be triggered.
 
 #### `setDistanceFilter()`
 
-```
+```java
 api.setDistanceFilter(distanceFilter);
 ```
 
@@ -175,7 +175,7 @@ Sets the maximum distance (in meters) between two devices to be eligible for pai
 
 #### `setTimingFilter()`
 
-```
+```java
 api.setTimingFilter(timingFilter);
 ```
 
@@ -191,7 +191,7 @@ Sets the maximum time difference (in seconds) between two shaking events to be e
 
 #### `setKeepSearching()`
 
-```
+```java
 api.setKeepSearching(keepSearching);
 ```
 
@@ -208,7 +208,7 @@ A positive value would allow to keep searching even though if a user has been fo
 
 #### `setMaxTimeSearch()`
 
-```
+```java
 api.setMaxTimeSearch(maxTimeSearch);
 ```
 
@@ -224,7 +224,7 @@ Sets the maximum time the server will be searching. This value can affect the re
 
 #### `setRefreshInterval()`
 
-```
+```java
 api.setRefreshInterval(refreshInterval);
 ```
 
@@ -242,11 +242,11 @@ Sets the refresh interval for the pairing algorithm. Greater values would allow 
 
 #### `setLocation()`
 
-```
+```java
 api.setLocation(location);
 ```
 or
-```
+```java
 api.setLocation(latitude, longitude);
 ```
 
