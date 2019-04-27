@@ -3,6 +3,15 @@
 DiHola Shaking API makes it easy to build fast and reliable ways to communicate between devices, just by shaking them.
 We provide such a secure and flexible protocol that this technology can be applied in any form of data exchange: Payment processing, file sharing, social networking, verification processes, etc.
 
+## Index
+1. [Installation](#installation)
+2. [Import](#import)
+3. [Usage](#usage)
+4. [Set Up your BroadcastReceiver](#set-up-your-broadcastreceiver)
+5. [Methods](#methods)
+6. [Intents](#intents)
+
+
 Installation
 -------
 
@@ -104,14 +113,14 @@ Methods
 
 ### Summary
 
-* [`start`](README.md#start)
-* [`stop`](README.md#stop)
-* [`setSensibility`](README.md#setSensibility)
-* [`setDistanceFilter`](README.md#setDistanceFilter)
-* [`setTimingFilter`](README.md#setTimingFilter)
-* [`setKeepSearching`](README.md#setKeepSearching)
-* [`setMaxTimeSearch`](README.md#setMaxTimeSearch)
-* [`setLocation`](README.md#setLocation)
+* [`start`](#start)
+* [`stop`](#stop)
+* [`setSensibility`](#setSensibility)
+* [`setDistanceFilter`](#setDistanceFilter)
+* [`setTimingFilter`](#setTimingFilter)
+* [`setKeepSearching`](#setKeepSearching)
+* [`setMaxTimeSearch`](#setMaxTimeSearch)
+* [`setLocation`](#setLocation)
 
 
 
