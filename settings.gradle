@@ -1,1 +1,1 @@
-include ':app', ':diholashakinglibrary'
+include ':app', ':shaking-api-android'
