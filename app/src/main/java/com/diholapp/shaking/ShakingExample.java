@@ -17,6 +17,10 @@ import java.util.ArrayList;
 public class ShakingExample extends AppCompatActivity {
 
     private final String TAG = "SHAKING_EXAMPLE";
+
+    private final String API_KEY = "Get one at www.diholapp.com";
+    private final String user = "TEST_USER_" + (int)(Math.random() * 1000000);
+
     private ShakingAPI api;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -76,7 +80,7 @@ public class ShakingExample extends AppCompatActivity {
         filter.addAction(ShakingIntents.SERVER_ERROR);
         registerReceiver(receiver, filter);
 
-        api = new ShakingAPI("1", "qwerty", this)
+        api = new ShakingAPI(user, API_KEY, this)
                 .setMaxTimeSearch(3000)
                 .setDistanceFilter(80)
                 .start();
