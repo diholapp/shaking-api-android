@@ -26,9 +26,9 @@ Note: We recommend that you don't use ```implementation 'com.github.diholapp:sha
 In your project’s ```build.gradle```:
 ```gradle
 allprojects {
-	repositories {
-		...
-	    maven { url 'https://jitpack.io' }
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
     }
 }
 ```
