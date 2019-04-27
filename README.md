@@ -25,11 +25,10 @@ Note: We recommend that you don't use ```implementation 'com.github.diholapp:sha
 
 In your project’s ```build.gradle```:
 ```gradle
-repositories {
-    ...
-    maven {
-        url 'https://jitpack.io'
-        credentials { username authToken }
+allprojects {
+	repositories {
+		...
+	    maven { url 'https://jitpack.io' }
     }
 }
 ```
