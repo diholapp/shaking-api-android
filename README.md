@@ -15,18 +15,18 @@ We provide such a secure and flexible protocol that this technology can be appli
 Installation
 -------
 
-Add the following dependency in your app's build.gradle:
+Add the following dependency in your app's ```build.gradle```:
 
 ```gradle
-implementation 'com.github.diholapp:shaking-api-android:0.1.0'
+implementation 'com.github.diholapp:shaking-api-android:0.2.0'
 ```
 
 Note: We recommend that you don't use ```implementation 'com.github.diholapp:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
 
-In your project’s build.gradle:
+In your project’s ```build.gradle```:
 ```gradle
 repositories {
-
+    ...
     maven {
         url 'https://jitpack.io'
         credentials { username authToken }
@@ -57,6 +57,8 @@ ShakingAPI api = new ShakingAPI(USER_ID, API_KEY, this).start();
 | USER_ID    | String     | User identifier              |
 | API_KEY    | String     | Get one at www.diholapp.com  |
 | context    | Context    | Activity context             |
+
+[Here](app/src/main/java/com/diholapp/shaking/ShakingExample.java) you can find an example.
 
 Set up your BroadcastReceiver
 ------------
@@ -115,12 +117,12 @@ Methods
 
 * [`start`](#start)
 * [`stop`](#stop)
-* [`setSensibility`](#setSensibility)
-* [`setDistanceFilter`](#setDistanceFilter)
-* [`setTimingFilter`](#setTimingFilter)
-* [`setKeepSearching`](#setKeepSearching)
-* [`setMaxTimeSearch`](#setMaxTimeSearch)
-* [`setLocation`](#setLocation)
+* [`setSensibility`](#setsensibility)
+* [`setDistanceFilter`](#setdistancefilter)
+* [`setTimingFilter`](#settimingfilter)
+* [`setKeepSearching`](#setkeepsearching)
+* [`setMaxTimeSearch`](#setmaxtimesearch)
+* [`setLocation`](#setlocation)
 
 
 
