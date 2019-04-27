@@ -102,7 +102,6 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         jsonObject.accumulate("sensibility",  delegate.getSensibility());
         jsonObject.accumulate("timingFilter",  delegate.getTimingFilter());
         jsonObject.accumulate("maxTimeSearch",  delegate.getMaxTimeSearch());
-        jsonObject.accumulate("refreshInterval",  delegate.getRefreshInterval());
         jsonObject.accumulate("distanceFilter",  delegate.getDistanceFilter());
         jsonObject.accumulate("keepSearching",  delegate.getKeepSearching());
 

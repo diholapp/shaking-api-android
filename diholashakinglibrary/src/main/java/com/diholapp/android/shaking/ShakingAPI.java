@@ -31,7 +31,6 @@ public class ShakingAPI implements AsyncResponse {
     private int distanceFilter = 100;
     private int timingFilter = 2000;
     private int maxTimeSearch = 2000;
-    private int refreshInterval = 250;
 
     private boolean keepSearching = false;
 
@@ -316,15 +315,6 @@ public class ShakingAPI implements AsyncResponse {
 
     public int getMaxTimeSearch(){
         return maxTimeSearch;
-    }
-
-    public ShakingAPI setRefreshInterval(int refreshInterval){
-        this.refreshInterval = refreshInterval;
-        return this;
-    }
-
-    public int getRefreshInterval(){
-        return refreshInterval;
     }
 
     public ShakingAPI setDistanceFilter(int distanceFilter){
