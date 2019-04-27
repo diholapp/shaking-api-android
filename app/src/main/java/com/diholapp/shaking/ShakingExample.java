@@ -14,8 +14,9 @@ import com.diholapp.android.shaking.ShakingIntents;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class ShakingExample extends AppCompatActivity {
 
+    private final String TAG = "SHAKING_EXAMPLE";
     private ShakingAPI api;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -26,36 +27,37 @@ public class MainActivity extends AppCompatActivity {
 
             switch (action){
                 case ShakingIntents.SHAKING:
-                    Log.i("HH2", "SHAKED");
+                    Log.i(TAG, "SHAKING");
                     break;
                 case ShakingIntents.MATCHED:
+                    Log.i(TAG, "MATCHED");
                     ArrayList<String> result = intent.getStringArrayListExtra("result");
                     break;
                 case ShakingIntents.NOT_MATCHED:
-                    Log.i("HH2", "NOT_MATCHED");
+                    Log.i(TAG, "NOT_MATCHED");
                     break;
                 case ShakingIntents.LOCATION_PERMISSION_ERROR:
-                    askPermmission();
-                    Log.i("HH2", "LOCATION_PERMISSION_ERROR");
+                    Log.i(TAG, "LOCATION_PERMISSION_ERROR");
+                    requestLocationPermission();
                     break;
                 case ShakingIntents.AUTHENTICATION_ERROR:
-                    Log.i("HH2", "AUTHENTICATION_ERROR");
+                    Log.i(TAG, "AUTHENTICATION_ERROR");
                     break;
                 case ShakingIntents.API_KEY_EXPIRED:
-                    Log.i("HH2", "API_KEY_EXPIRED");
+                    Log.i(TAG, "API_KEY_EXPIRED");
                     break;
                 case ShakingIntents.TIMEOUT:
-                    Log.i("HH2", "TIMEOUT");
+                    Log.i(TAG, "TIMEOUT");
                     break;
                 case ShakingIntents.SERVER_ERROR:
-                    Log.i("HH2", "SERVER_ERROR");
+                    Log.i(TAG, "SERVER_ERROR");
                     break;
             }
         }
     };
 
-    private void askPermmission(){
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 3456);
+    private void requestLocationPermission(){
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
 
     @Override
@@ -74,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(ShakingIntents.SERVER_ERROR);
         registerReceiver(receiver, filter);
 
-        api = new ShakingAPI("1", "qwerty", this).setMaxTimeSearch(2000);
-        api.start();
-
-        //ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 3456);
+        api = new ShakingAPI("1", "qwerty", this)
+                .setMaxTimeSearch(3000)
+                .setDistanceFilter(80)
+                .start();
     }
 
 
