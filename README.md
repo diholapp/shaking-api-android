@@ -3,6 +3,15 @@
 DiHola Shaking API makes it easy to build fast and reliable ways to communicate between devices, just by shaking them.
 We provide such a secure and flexible protocol that this technology can be applied in any form of data exchange: Payment processing, file sharing, social networking, verification processes, etc.
 
+## Index
+1. [Installation](#installation)
+2. [Import](#import)
+3. [Usage](#usage)
+4. [Set Up your BroadcastReceiver](#set-up-your-broadcastreceiver)
+5. [Methods](#methods)
+6. [Intents](#intents)
+
+
 Installation
 -------
 
@@ -37,16 +46,17 @@ import com.diholapp.android.shaking.ShakingIntents;
 Usage
 -------
 
-```
+```java
 ShakingAPI api = new ShakingAPI(USER_ID, API_KEY, this).start();
 ```
 
 **Parameters:**
-| Name       | Type       | Description  |
-| -----------| --------   | -------- |
-| USER_ID    | String     | User identifier |
+
+| Name       | Type       | Description                  |
+| -----------| -----------| -----------------------------|
+| USER_ID    | String     | User identifier              |
 | API_KEY    | String     | Get one at www.diholapp.com  |
-| context    | Context    | Activity context |
+| context    | Context    | Activity context             |
 
 Set up your BroadcastReceiver
 ------------
@@ -67,6 +77,7 @@ private final BroadcastReceiver receiver = new BroadcastReceiver() {
                 case ShakingIntents.NOT_MATCHED:
                     break;
                 case ShakingIntents.LOCATION_PERMISSION_ERROR:
+                    // Ask ACCESS_FINE_LOCATION permission
                     break;
                 case ShakingIntents.AUTHENTICATION_ERROR:
                     break;
@@ -102,15 +113,14 @@ Methods
 
 ### Summary
 
-* [`start`](README.md#start)
-* [`stop`](README.md#stop)
-* [`setSensibility`](README.md#setSensibility)
-* [`setDistanceFilter`](README.md#setDistanceFilter)
-* [`setTimingFilter`](README.md#setTimingFilter)
-* [`setKeepSearching`](README.md#setKeepSearching)
-* [`setMaxTimeSearch`](README.md#setMaxTimeSearch)
-* [`setRefreshInterval`](README.md#setRefreshInterval)
-* [`setLocation`](README.md#setLocation)
+* [`start`](#start)
+* [`stop`](#stop)
+* [`setSensibility`](#setSensibility)
+* [`setDistanceFilter`](#setDistanceFilter)
+* [`setTimingFilter`](#setTimingFilter)
+* [`setKeepSearching`](#setKeepSearching)
+* [`setMaxTimeSearch`](#setMaxTimeSearch)
+* [`setLocation`](#setLocation)
 
 
 
@@ -118,7 +128,7 @@ Methods
 
 #### `start()`
 
-```
+```java
 api.start();
 ```
 
@@ -129,7 +139,7 @@ Starts listening to shaking events.
 
 #### `stop()`
 
-```
+```java
 api.stop();
 ```
 
@@ -140,7 +150,7 @@ Stops listening to shaking events.
 
 #### `setSensibility()`
 
-```
+```java
 api.setSensibility(sensibility);
 ```
 
@@ -150,14 +160,14 @@ Sets the sensibility for the shaking event to be triggered.
 
 | Name        | Type     | Default|
 | ----------- | -------- | -------- |
-| sensibility| double     | 20      |
+| sensibility| double     | 25      |
 
 ---
 
 
 #### `setDistanceFilter()`
 
-```
+```java
 api.setDistanceFilter(distanceFilter);
 ```
 
@@ -167,30 +177,30 @@ Sets the maximum distance (in meters) between two devices to be eligible for pai
 
 | Name        | Type     | Default| Note|
 | ----------- | -------- | -------- | ----------------------------------------- |
-| distanceFilter| double     | 100  | GPS margin error must be taken into account        |
+| distanceFilter| int     | 100  | GPS margin error must be taken into account        |
 
 ---
 
 
 #### `setTimingFilter()`
 
-```
+```java
 api.setTimingFilter(timingFilter);
 ```
 
-Sets the maximum time difference (in seconds) between two shaking events to be eligible for pairing.
+Sets the maximum time difference (in milliseconds) between two shaking events to be eligible for pairing.
 
 **Parameters:**
 
 | Name        | Type     | Default|
 | ----------- | -------- | -------- |
-| timingFilter| double   | 2 |
+| timingFilter| int   | 2000 |
 
 ---
 
 #### `setKeepSearching()`
 
-```
+```java
 api.setKeepSearching(keepSearching);
 ```
 
@@ -207,45 +217,28 @@ A positive value would allow to keep searching even though if a user has been fo
 
 #### `setMaxTimeSearch()`
 
-```
+```java
 api.setMaxTimeSearch(maxTimeSearch);
 ```
 
-Sets the maximum time the server will be searching. This value can affect the response time.
+Sets the maximum time the server will be searching (in milliseconds). This value can affect the response time.
 
 **Parameters:**
 
 | Name        | Type     | Default| Description                               |
 | ----------- | -------- | -------- | ----------------------------------------- |
-| maxTimeSearch| double     | 2      | Value between 1 and 20        |
+| maxTimeSearch| int     | 2000      | Value between 100 and 10000        |
 
 ---
-
-#### `setRefreshInterval()`
-
-```
-api.setRefreshInterval(refreshInterval);
-```
-
-Sets the refresh interval for the pairing algorithm. Greater values would allow to pair with multiple devices.
-
-**Parameters:**
-
-| Name        | Type     | Default| Description                               |
-| ----------- | -------- | -------- | ----------------------------------------- |
-| refreshInterval| double     | 0.25      | Value between 0.1 and maxTimeSearch        |
-
----
-
 
 
 #### `setLocation()`
 
-```
+```java
 api.setLocation(location);
 ```
 or
-```
+```java
 api.setLocation(latitude, longitude);
 ```
 
@@ -285,8 +278,3 @@ The only necessary action in the purpose of this library is MATCHED. The others 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
