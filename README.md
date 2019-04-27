@@ -111,7 +111,6 @@ Methods
 * [`setTimingFilter`](README.md#setTimingFilter)
 * [`setKeepSearching`](README.md#setKeepSearching)
 * [`setMaxTimeSearch`](README.md#setMaxTimeSearch)
-* [`setRefreshInterval`](README.md#setRefreshInterval)
 * [`setLocation`](README.md#setLocation)
 
 
@@ -223,23 +222,6 @@ Sets the maximum time the server will be searching (in milliseconds). This value
 
 ---
 
-#### `setRefreshInterval()`
-
-```java
-api.setRefreshInterval(refreshInterval);
-```
-
-Sets the refresh interval for the pairing algorithm (in milliseconds). Greater values would allow to pair with multiple devices when keepSearching is disabled.
-
-**Parameters:**
-
-| Name        | Type     | Default| Description                               |
-| ----------- | -------- | -------- | ----------------------------------------- |
-| refreshInterval| int     | 250      | Value between 100 and maxTimeSearch        |
-
----
-
-
 
 #### `setLocation()`
 
@@ -287,8 +269,3 @@ The only necessary action in the purpose of this library is MATCHED. The others 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
