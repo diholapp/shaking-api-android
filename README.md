@@ -80,7 +80,9 @@ private final BroadcastReceiver receiver = new BroadcastReceiver() {
                 case ShakingIntents.LOCATION_PERMISSION_ERROR:
                     // Ask ACCESS_FINE_LOCATION permission
                     break;
-                case ShakingIntents.AUTHENTICATION_ERROR:
+                case ShakingIntents.LOCATION_DISABLED:
+                    break;
+		case ShakingIntents.AUTHENTICATION_ERROR:
                     break;
                 case ShakingIntents.API_KEY_EXPIRED:
                     break;
@@ -99,6 +101,7 @@ filter.addAction(ShakingIntents.SHAKING);
 filter.addAction(ShakingIntents.MATCHED);
 filter.addAction(ShakingIntents.NOT_MATCHED);
 filter.addAction(ShakingIntents.LOCATION_PERMISSION_ERROR);
+filter.addAction(ShakingIntents.LOCATION_DISABLED);
 filter.addAction(ShakingIntents.AUTHENTICATION_ERROR);
 filter.addAction(ShakingIntents.API_KEY_EXPIRED);
 filter.addAction(ShakingIntents.TIMEOUT);
@@ -122,6 +125,7 @@ Methods
 * [`setKeepSearching`](#setkeepsearching)
 * [`setMaxTimeSearch`](#setmaxtimesearch)
 * [`setLocation`](#setlocation)
+* [`isLocationEnabled`](#islocationenabled)
 
 
 
@@ -255,7 +259,15 @@ Setting the location manually will disable using the device location.
 
 ---
 
+#### `isLocationEnabled()`
 
+```java
+api.isLocationEnabled();
+```
+
+Returns true if the device location is enabled, otherwise false.
+
+---
 
 
 Intents
@@ -267,6 +279,7 @@ Intents
 | MATCHED                  | ```ArrayList<String> result``` | Match with 1 or more users|
 | NOT_MATCHED              | -                              | Not matched|
 | LOCATION_PERMISSION_ERROR| -                              | Location permission has not been accepted|
+| LOCATION_DISABLED        | -                              | Location is disabled|
 | SENSOR_ERROR             | -                              | The sensor devices are not available |
 | AUTHENTICATION_ERROR     | -                              | API key invalid|
 | API_KEY_EXPIRED          | -                              | API key expired|
