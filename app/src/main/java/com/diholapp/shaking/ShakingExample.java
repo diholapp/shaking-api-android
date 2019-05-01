@@ -44,6 +44,9 @@ public class ShakingExample extends AppCompatActivity {
                     Log.i(TAG, "LOCATION_PERMISSION_ERROR");
                     requestLocationPermission();
                     break;
+                case ShakingIntents.LOCATION_DISABLED:
+                    Log.i(TAG, "LOCATION_DISABLED");
+                    break;
                 case ShakingIntents.AUTHENTICATION_ERROR:
                     Log.i(TAG, "AUTHENTICATION_ERROR");
                     break;
@@ -74,6 +77,7 @@ public class ShakingExample extends AppCompatActivity {
         filter.addAction(ShakingIntents.MATCHED);
         filter.addAction(ShakingIntents.NOT_MATCHED);
         filter.addAction(ShakingIntents.LOCATION_PERMISSION_ERROR);
+        filter.addAction(ShakingIntents.LOCATION_DISABLED);
         filter.addAction(ShakingIntents.AUTHENTICATION_ERROR);
         filter.addAction(ShakingIntents.API_KEY_EXPIRED);
         filter.addAction(ShakingIntents.TIMEOUT);

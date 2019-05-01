@@ -8,6 +8,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -110,6 +111,10 @@ public class ShakingAPI implements AsyncResponse {
 
     @Override
     public void onShakingEvent(){
+
+        if(!isLocationEnabled()){
+            sendBroadcast(ShakingIntents.LOCATION_DISABLED);
+        }
 
         processing = true;
         pause();
@@ -246,6 +251,25 @@ public class ShakingAPI implements AsyncResponse {
 
     private void unregisterLocationListener(){
         mLocationManager.removeUpdates(mLocationListener);
+    }
+
+    public boolean isLocationEnabled(){
+        boolean gpsEnabled = false;
+        boolean networkEnabled = false;
+
+        try {
+            gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            networkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        if(!gpsEnabled && !networkEnabled) {
+            return false;
+        }
+
+        return true;
     }
 
     public Context getContext(){

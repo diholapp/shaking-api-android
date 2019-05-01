@@ -18,6 +18,10 @@ public class ShakingIntents {
      */
     public static final String LOCATION_PERMISSION_ERROR = "com.diholapp.shaking.locationPermissionError";
 
+    /* Broadcast when the location is disabled.
+     */
+    public static final String LOCATION_DISABLED = "com.diholapp.shaking.locationDisabled";
+
     /* Broadcast when the server fails to validate the API key.
      */
     public static final String AUTHENTICATION_ERROR = "com.diholapp.shaking.authenticationError";
