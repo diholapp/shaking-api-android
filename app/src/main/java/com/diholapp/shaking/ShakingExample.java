@@ -85,7 +85,7 @@ public class ShakingExample extends AppCompatActivity {
         registerReceiver(receiver, filter);
 
         api = new ShakingAPI(user, API_KEY, this)
-                .setMaxTimeSearch(3000)
+                .setTimingFilter(3000)
                 .setDistanceFilter(80)
                 .start();
     }

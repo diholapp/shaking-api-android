@@ -31,7 +31,6 @@ public class ShakingAPI implements AsyncResponse {
     private double sensibility = 25;
     private int distanceFilter = 100;
     private int timingFilter = 2000;
-    private int maxTimeSearch = 2000;
 
     private boolean keepSearching = false;
 
@@ -181,7 +180,6 @@ public class ShakingAPI implements AsyncResponse {
                     throw new Exception(value);
                 }
             }
-
         }
 
         JSONArray jArray = (JSONArray) jo.get("response");
@@ -330,15 +328,6 @@ public class ShakingAPI implements AsyncResponse {
 
     public int getTimingFilter(){
         return timingFilter;
-    }
-
-    public ShakingAPI setMaxTimeSearch(int maxTimeSearch){
-        this.maxTimeSearch = maxTimeSearch;
-        return this;
-    }
-
-    public int getMaxTimeSearch(){
-        return maxTimeSearch;
     }
 
     public ShakingAPI setDistanceFilter(int distanceFilter){

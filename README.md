@@ -119,11 +119,11 @@ Methods
 
 * [`start`](#start)
 * [`stop`](#stop)
+* [`simulate`](#simulate)
 * [`setSensibility`](#setsensibility)
 * [`setDistanceFilter`](#setdistancefilter)
 * [`setTimingFilter`](#settimingfilter)
 * [`setKeepSearching`](#setkeepsearching)
-* [`setMaxTimeSearch`](#setmaxtimesearch)
 * [`setLocation`](#setlocation)
 * [`isLocationEnabled`](#islocationenabled)
 
@@ -149,6 +149,16 @@ api.stop();
 ```
 
 Stops listening to shaking events.
+
+---
+
+#### `simulate()`
+
+```java
+api.simulate();
+```
+
+Simulates the shaking event.
 
 
 ---
@@ -197,9 +207,9 @@ Sets the maximum time difference (in milliseconds) between two shaking events to
 
 **Parameters:**
 
-| Name        | Type     | Default|
-| ----------- | -------- | -------- |
-| timingFilter| int   | 2000 |
+| Name        | Type     | Default| Note|
+| ----------- | -------- | -------- | -------- |
+| timingFilter| int   | 2000 | Value between 100 and 10000 |
 
 ---
 
@@ -209,30 +219,13 @@ Sets the maximum time difference (in milliseconds) between two shaking events to
 api.setKeepSearching(keepSearching);
 ```
 
-A positive value would allow to keep searching even though if a user has been found. This could allow to pair with multiple devices. The response time will be affected by the maxTimeSearch value.
+A positive value would allow to keep searching even though if a user has been found. This could allow to pair with multiple devices. The response time will be affected by the timingFilter value.
 
 **Parameters:**
 
 | Name        | Type     | Default|
 | ----------- | -------- | -------- |
 | keepSearching| boolean| false|
-
----
-
-
-#### `setMaxTimeSearch()`
-
-```java
-api.setMaxTimeSearch(maxTimeSearch);
-```
-
-Sets the maximum time the server will be searching (in milliseconds). This value can affect the response time.
-
-**Parameters:**
-
-| Name        | Type     | Default| Description                               |
-| ----------- | -------- | -------- | ----------------------------------------- |
-| maxTimeSearch| int     | 2000      | Value between 100 and 10000        |
 
 ---
 
