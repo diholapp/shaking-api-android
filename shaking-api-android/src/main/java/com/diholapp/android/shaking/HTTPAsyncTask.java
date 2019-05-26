@@ -19,7 +19,7 @@ import java.net.URL;
 public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
     private ShakingAPI delegate;
-    private final String url = "https://diholapplication.com/shaking/connect";
+    private final String url = "https://api.diholapplication.com/shaking/connect";
 
     public HTTPAsyncTask(ShakingAPI delegate){
         this.delegate = delegate;
@@ -101,7 +101,6 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
         jsonObject.accumulate("sensibility",  delegate.getSensibility());
         jsonObject.accumulate("timingFilter",  delegate.getTimingFilter());
-        jsonObject.accumulate("maxTimeSearch",  delegate.getMaxTimeSearch());
         jsonObject.accumulate("distanceFilter",  delegate.getDistanceFilter());
         jsonObject.accumulate("keepSearching",  delegate.getKeepSearching());
 

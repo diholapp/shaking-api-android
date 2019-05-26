@@ -42,7 +42,7 @@ public class ShakingAPI implements AsyncResponse {
     private LocationListener mLocationListener;
 
     private boolean stopped = true;
-    private boolean running = false;
+    private boolean paused = false;
     private boolean processing = false;
     private boolean manualLocation = false;
 
@@ -59,9 +59,9 @@ public class ShakingAPI implements AsyncResponse {
 
     public ShakingAPI start(){
 
-        if(stopped && !processing){
+        if(stopped){
             stopped = false;
-            running = true;
+            paused = false;
             if(!manualLocation) registerLocationListener();
             mAccelerometer.startUpdates();
         }
@@ -73,7 +73,7 @@ public class ShakingAPI implements AsyncResponse {
 
         if(!stopped){
             stopped = true;
-            running = false;
+            paused = false;
             unregisterLocationListener();
             mAccelerometer.stopUpdates();
         }
@@ -83,8 +83,8 @@ public class ShakingAPI implements AsyncResponse {
 
     private void restart(){
 
-        if(!stopped && !processing){
-            running = true;
+        if(!stopped && !processing && paused){
+            paused = false;
             if(!manualLocation) registerLocationListener();
             mAccelerometer.startUpdates();
         }
@@ -93,8 +93,8 @@ public class ShakingAPI implements AsyncResponse {
 
     private void pause(){
 
-        if(running){
-            running = false;
+        if(!paused){
+            paused = true;
             unregisterLocationListener();
             mAccelerometer.stopUpdates();
         }
