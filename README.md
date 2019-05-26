@@ -276,7 +276,6 @@ Intents
 | SENSOR_ERROR             | -                              | The sensor devices are not available |
 | AUTHENTICATION_ERROR     | -                              | API key invalid|
 | API_KEY_EXPIRED          | -                              | API key expired|
-| TIMEOUT                  | -                              | The server connection has timed out|
 | SERVER_ERROR             | -                              | Server is not available|
 
 The only necessary action in the purpose of this library is MATCHED. The others are optional but we recommend to handle them.

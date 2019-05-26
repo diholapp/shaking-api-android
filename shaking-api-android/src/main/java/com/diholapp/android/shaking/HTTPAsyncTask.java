@@ -31,18 +31,10 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         try {
             return HttpPost(url);
         }
-        catch (SocketTimeoutException e) {
-            // TODO: Fix this, never thrown
-            delegate.sendBroadcast(ShakingIntents.TIMEOUT);
-        }
-        catch (IOException e) {
-            //delegate.sendBroadcast(ShakingIntents.SERVER_ERROR);
-        }
-        catch (JSONException e) {
-            //delegate.sendBroadcast(ShakingIntents.SERVER_ERROR);
+        catch (Exception e) {
+            return "";
         }
 
-        return "";
     }
 
     // onPostExecute displays the results of the AsyncTask.

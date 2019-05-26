@@ -127,6 +127,8 @@ public class ShakingAPI implements AsyncResponse {
 
         Intent intent = new Intent();
 
+        boolean serverError = false;
+
         try {
             ArrayList<String> response = processJsonResponse(output);
 
@@ -149,10 +151,20 @@ public class ShakingAPI implements AsyncResponse {
             }
             else {
                 intent.setAction(ShakingIntents.SERVER_ERROR);
+                serverError = true;
             }
         }
 
         mContext.sendBroadcast(intent);
+
+        if(serverError){
+            // Avoids overlapping in case of no
+            // internet connection
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {}
+        }
+
         processing = false;
         restart();
     }
