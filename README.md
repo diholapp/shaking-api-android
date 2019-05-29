@@ -86,8 +86,6 @@ private final BroadcastReceiver receiver = new BroadcastReceiver() {
                     break;
                 case ShakingIntents.API_KEY_EXPIRED:
                     break;
-                case ShakingIntents.TIMEOUT:
-                    break;
                 case ShakingIntents.SERVER_ERROR:
                     break;
                 case ShakingIntents.SENSOR_ERROR:
@@ -104,7 +102,6 @@ filter.addAction(ShakingIntents.LOCATION_PERMISSION_ERROR);
 filter.addAction(ShakingIntents.LOCATION_DISABLED);
 filter.addAction(ShakingIntents.AUTHENTICATION_ERROR);
 filter.addAction(ShakingIntents.API_KEY_EXPIRED);
-filter.addAction(ShakingIntents.TIMEOUT);
 filter.addAction(ShakingIntents.SERVER_ERROR);
 filter.addAction(ShakingIntents.SENSOR_ERROR);
 registerReceiver(receiver, filter);
