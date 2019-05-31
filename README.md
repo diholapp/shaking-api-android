@@ -18,20 +18,10 @@ Installation
 Add the following dependency in your app's ```build.gradle```:
 
 ```gradle
-implementation 'com.github.diholapp:shaking-api-android:0.2.0'
+implementation 'com.diholapp.shaking:shaking-api-android:0.3.1'
 ```
 
-Note: We recommend that you don't use ```implementation 'com.github.diholapp:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
-
-In your project’s ```build.gradle```:
-```gradle
-allprojects {
-    repositories {
-	...
-	maven { url 'https://jitpack.io' }
-    }
-}
-```
+Note: We recommend that you don't use ```implementation 'com.diholapp.shaking:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
 
 
 Import
