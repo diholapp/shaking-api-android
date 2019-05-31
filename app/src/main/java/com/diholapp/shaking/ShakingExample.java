@@ -53,9 +53,6 @@ public class ShakingExample extends AppCompatActivity {
                 case ShakingIntents.API_KEY_EXPIRED:
                     Log.i(TAG, "API_KEY_EXPIRED");
                     break;
-                case ShakingIntents.TIMEOUT:
-                    Log.i(TAG, "TIMEOUT");
-                    break;
                 case ShakingIntents.SERVER_ERROR:
                     Log.i(TAG, "SERVER_ERROR");
                     break;
@@ -80,7 +77,6 @@ public class ShakingExample extends AppCompatActivity {
         filter.addAction(ShakingIntents.LOCATION_DISABLED);
         filter.addAction(ShakingIntents.AUTHENTICATION_ERROR);
         filter.addAction(ShakingIntents.API_KEY_EXPIRED);
-        filter.addAction(ShakingIntents.TIMEOUT);
         filter.addAction(ShakingIntents.SERVER_ERROR);
         registerReceiver(receiver, filter);
 
