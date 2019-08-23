@@ -13,8 +13,6 @@ There is available a version of this library which allows to connect devices wit
 4. [Error codes](#error-codes)
 
 
-# Installation
-
 Installation
 -------
 
@@ -254,7 +252,6 @@ shakingConfig.setDistanceFilter(distanceFilter);
 ```
 
 Sets the maximum distance (in meters) between two devices to be eligible for pairing.
-***Note:*** Only used in the online mode.
 
 **Parameters:**
 
@@ -312,20 +309,6 @@ Sets the user identifier.
 | userId| String| Unique user identifier in the context of the app (255 characters max)|
 
 ---
-
-#### `setOnline()`
-
-```java
-shakingConfig.setOnline(onlineEnabled);
-```
-
-Enables or disable the online connection.
-
-**Parameters:**
-
-| Name        | Type     | Default|
-| ----------- | -------- | -------- |
-| onlineEnabled| boolean| true|
 
 #### `setConnectOnlyWith()`
 
