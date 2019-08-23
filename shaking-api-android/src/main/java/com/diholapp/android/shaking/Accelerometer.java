@@ -5,42 +5,44 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import static java.lang.Math.abs;
 
-public class Accelerometer implements SensorEventListener {
-
-    private final Context mContext;
+class Accelerometer implements SensorEventListener {
 
     private final int interval = 100;
 
     private double lastReading = (double) System.currentTimeMillis();
 
-    private final Sensor sensor;
+    private long lastShakingTimestamp;
+
+    private Sensor sensor;
     private final SensorManager sensorManager;
 
     private ShakingAPI delegate;
 
-    public Accelerometer(ShakingAPI delegate) {
+    Accelerometer(ShakingAPI delegate) {
 
         this.delegate = delegate;
-        mContext = delegate.getContext();
-        sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager = (SensorManager) delegate.getContext().getSystemService(Context.SENSOR_SERVICE);
 
+        try {
+            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        } catch (NullPointerException e){
+            sensor = null;
+        }
     }
 
-    public void startUpdates(){
+    void start(){
         if (sensor != null) {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
         else {
-            delegate.sendBroadcast(ShakingIntents.SENSOR_ERROR);
+            delegate.addError(ShakingCodes.SENSOR_ERROR);
         }
     }
 
-    public void stopUpdates(){
+    void stop(){
         sensorManager.unregisterListener(this);
     }
 
@@ -50,19 +52,26 @@ public class Accelerometer implements SensorEventListener {
         if (tempMs - lastReading >= interval){
             lastReading = tempMs;
 
-            if(mustTriggerEvent(sensorEvent, tempMs)){
-                delegate.onShakingEvent();
+            if(mustTriggerEvent(sensorEvent)){
+                onShakingEvent();
             }
         }
     }
 
+    void onShakingEvent(){
+        lastShakingTimestamp = System.nanoTime();
+        delegate.onShakingEvent();
+    }
 
-    private boolean mustTriggerEvent(SensorEvent sensorEvent, double tempMs){
+    long getLastShakingTimestamp(){
+        return lastShakingTimestamp;
+    }
+
+    private boolean mustTriggerEvent(SensorEvent sensorEvent){
 
         double totalValue = abs(sensorEvent.values[0]) + abs(sensorEvent.values[1]) + abs(sensorEvent.values[2]);
-        return totalValue > delegate.getSensibility();
+        return totalValue > delegate.getConfig().getSensibility();
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }

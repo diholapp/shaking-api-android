@@ -1,6 +1,7 @@
-package com.diholapp.android.shaking;
+package com.diholapp.android.shaking.server;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,23 +14,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 
-public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
+public abstract class ServerRequest extends AsyncTask<String, Void, String> {
 
-    private ShakingAPI delegate;
-    private final String url = "https://api.diholapplication.com/shaking/connect";
+    protected int TIMEOUT;
+    protected String URL_REQUEST;
 
-    public HTTPAsyncTask(ShakingAPI delegate){
-        this.delegate = delegate;
-    }
+    protected abstract JSONObject buildBodyRequest() throws JSONException;
 
     @Override
     protected String doInBackground(String... urls) {
 
         try {
-            return HttpPost(url);
+            return HttpPost();
         }
         catch (Exception e) {
             return "";
@@ -37,23 +35,18 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
 
     }
 
-    // onPostExecute displays the results of the AsyncTask.
-    @Override
-    protected void onPostExecute(String result) {
-        delegate.processFinish(result);
-    }
+    private String HttpPost() throws IOException, JSONException {
 
-    private String HttpPost(String myUrl) throws IOException, JSONException {
-
-        URL url = new URL(myUrl);
+        URL url = new URL(URL_REQUEST);
 
         // 1. create HttpURLConnection
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        conn.setConnectTimeout(TIMEOUT);
 
         // 2. build JSON object
-        JSONObject jsonObject = buildJsonObject();
+        JSONObject jsonObject = buildBodyRequest();
 
         // 3. add JSON content to POST request body
         setPostRequestContent(conn, jsonObject);
@@ -81,28 +74,11 @@ public class HTTPAsyncTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    private JSONObject buildJsonObject() throws JSONException {
-
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.accumulate("id", delegate.getUser());
-        jsonObject.accumulate("api_key",  delegate.getApiKey());
-
-        jsonObject.accumulate("lat",  delegate.getLat());
-        jsonObject.accumulate("lng",  delegate.getLng());
-
-        jsonObject.accumulate("sensibility",  delegate.getSensibility());
-        jsonObject.accumulate("timingFilter",  delegate.getTimingFilter());
-        jsonObject.accumulate("distanceFilter",  delegate.getDistanceFilter());
-        jsonObject.accumulate("keepSearching",  delegate.getKeepSearching());
-
-        return jsonObject;
-    }
-
     private void setPostRequestContent(HttpURLConnection conn, JSONObject jsonObject) throws IOException {
 
         OutputStream os = conn.getOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+
         writer.write(jsonObject.toString());
         writer.flush();
         writer.close();

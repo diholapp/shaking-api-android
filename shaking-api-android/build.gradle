@@ -1,17 +1,19 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
-
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
 
 ext {
     bintrayRepo = 'dihola'
@@ -23,11 +25,10 @@ ext {
 
     libraryDescription = 'DiHola Shaking API for Android.'
 
-
     gitUrl = 'https://github.com/diholapp/shaking-api-android'
     siteUrl = 'https://www.diholapp.com'
 
-    libraryVersion = '0.3.1'
+    libraryVersion = '0.5.2'
 
     developerId = 'juanse'
     developerName = 'Juanse Brito'
@@ -40,8 +41,6 @@ ext {
 
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 15
@@ -60,19 +59,27 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.googlecode.json-simple:json-simple:1.1'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    compile('com.googlecode.json-simple:json-simple:1.1@jar'){
+        transitive = true;
+    }
+
+    compile 'com.android.support:appcompat-v7:27.1.1'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
-
-
 
 group = publishedGroupId
 version = libraryVersion
@@ -130,6 +137,23 @@ artifacts {
     archives sourcesJar
 }
 
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+
+            pom.withXml {
+                // Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.compile.allDependencies.each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
+            }
+        }
+    }
+}
+
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
@@ -149,7 +173,7 @@ bintray {
         dryRun = false
         publish = true
         override = false
-        publicDownloadNumbers = true
+        publicDownloadNumbers = false
         version {
             desc = libraryDescription
         }

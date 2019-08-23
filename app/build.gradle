@@ -16,6 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,6 +32,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     //implementation project(path: ':shaking-api-android')
-
-    implementation 'com.diholapp.shaking:shaking-api-android:0.3.1'
+    implementation 'com.diholapp.shaking:shaking-api-android:0.5.2'
 }

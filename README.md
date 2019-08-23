@@ -3,14 +3,17 @@
 DiHola Shaking API makes it easy to build fast and reliable ways to communicate between devices, just by shaking them.
 We provide such a secure and flexible protocol that this technology can be applied in any form of data exchange: Payment processing, file sharing, social networking, verification processes, etc.
 
+There is available a version of this library which allows to connect devices without internet connection, please [contact us](https://www.diholapp.com).
+
+
 ## Index
 1. [Installation](#installation)
-2. [Import](#import)
-3. [Usage](#usage)
-4. [Set Up your BroadcastReceiver](#set-up-your-broadcastreceiver)
-5. [Methods](#methods)
-6. [Intents](#intents)
+2. [Usage](#usage)
+3. [Methods](#methods)
+4. [Error codes](#error-codes)
 
+
+# Installation
 
 Installation
 -------
@@ -18,102 +21,87 @@ Installation
 Add the following dependency in your app's ```build.gradle```:
 
 ```gradle
-implementation 'com.diholapp.shaking:shaking-api-android:0.3.1'
+implementation 'com.diholapp.shaking:shaking-api-android:0.5.2'
 ```
 
-Note: We recommend that you don't use ```implementation 'com.diholapp.shaking:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
+***Note:*** We recommend that you don't use ```implementation 'com.diholapp.shaking:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
 
+***Note:*** This library requires Java 1.8.
 
-Import
+```gradle
+android {
+   compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+```
+
+Permissions
 -------
 
-```java
-import com.diholapp.android.shaking.ShakingAPI;
-import com.diholapp.android.shaking.ShakingIntents;
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
 
 Usage
 -------
 
 ```java
-ShakingAPI api = new ShakingAPI(USER_ID, API_KEY, this).start();
+import com.diholapp.android.shaking.ShakingAPI;
+import com.diholapp.android.shaking.ShakingConfig;
+import com.diholapp.android.shaking.ShakingCodes;
+
+ShakingConfig shakingConfig = new ShakingConfig(USER_ID, API_KEY);
+ShakingAPI shakingAPI = new ShakingAPI(shakingConfig, this){
+
+    @Override
+    public void onInit(ArrayList<ShakingCodes> errors) {
+
+    }
+
+    @Override
+    public void onShaking(ArrayList<ShakingCodes> errors) {
+
+    }
+
+    @Override
+    public void onResult(ArrayList<String> result, ArrayList<ShakingCodes> errors) {
+
+    }
+};
 ```
-
-**Parameters:**
-
-| Name       | Type       | Description                  |
-| -----------| -----------| -----------------------------|
-| USER_ID    | String     | User identifier              |
-| API_KEY    | String     | Get one at www.diholapp.com  |
-| context    | Context    | Activity context             |
 
 [Here](app/src/main/java/com/diholapp/shaking/ShakingExample.java) you can find an example.
-
-Set up your BroadcastReceiver
-------------
-
-```java
-private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            final String action = intent.getAction();
-
-            switch (action){
-                case ShakingIntents.SHAKING:
-                    break;
-                case ShakingIntents.MATCHED:
-                    ArrayList<String> result = intent.getStringArrayListExtra("result");
-                    break;
-                case ShakingIntents.NOT_MATCHED:
-                    break;
-                case ShakingIntents.LOCATION_PERMISSION_ERROR:
-                    // Ask ACCESS_FINE_LOCATION permission
-                    break;
-                case ShakingIntents.LOCATION_DISABLED:
-                    break;
-		case ShakingIntents.AUTHENTICATION_ERROR:
-                    break;
-                case ShakingIntents.API_KEY_EXPIRED:
-                    break;
-                case ShakingIntents.SERVER_ERROR:
-                    break;
-                case ShakingIntents.SENSOR_ERROR:
-                    break;
-            }
-        }
-};
-
-IntentFilter filter = new IntentFilter();
-filter.addAction(ShakingIntents.SHAKING);
-filter.addAction(ShakingIntents.MATCHED);
-filter.addAction(ShakingIntents.NOT_MATCHED);
-filter.addAction(ShakingIntents.LOCATION_PERMISSION_ERROR);
-filter.addAction(ShakingIntents.LOCATION_DISABLED);
-filter.addAction(ShakingIntents.AUTHENTICATION_ERROR);
-filter.addAction(ShakingIntents.API_KEY_EXPIRED);
-filter.addAction(ShakingIntents.SERVER_ERROR);
-filter.addAction(ShakingIntents.SENSOR_ERROR);
-registerReceiver(receiver, filter);
-```
-
 
 
 Methods
 -------
 
-### Summary
+##### ShakingAPI
 
 * [`start`](#start)
 * [`stop`](#stop)
 * [`simulate`](#simulate)
+* [`onInit`](#oninit)
+* [`onShaking`](#onshaking)
+* [`onResult`](#onresult)
+* [`isRunning`](#isrunning)
+* [`setConfig`](#setconfig)
+* [`getConfig`](#getconfig)
+
+
+##### ShakingConfig
+
 * [`setSensibility`](#setsensibility)
 * [`setDistanceFilter`](#setdistancefilter)
 * [`setTimingFilter`](#settimingfilter)
 * [`setKeepSearching`](#setkeepsearching)
-* [`setLocation`](#setlocation)
-* [`isLocationEnabled`](#islocationenabled)
-
+* [`setUserId`](#setuserid)
+* [`setConnectOnlyWith`](#setconnectonlywith)
 
 
 ### Details
@@ -121,7 +109,7 @@ Methods
 #### `start()`
 
 ```java
-api.start();
+shakingAPI.start();
 ```
 
 Starts listening to shaking events.
@@ -132,7 +120,7 @@ Starts listening to shaking events.
 #### `stop()`
 
 ```java
-api.stop();
+shakingAPI.stop();
 ```
 
 Stops listening to shaking events.
@@ -142,18 +130,74 @@ Stops listening to shaking events.
 #### `simulate()`
 
 ```java
-api.simulate();
+shakingAPI.simulate();
 ```
 
 Simulates the shaking event.
 
+---
+
+#### `onInit()`
+
+```java
+shakingAPI.onInit(errors);
+```
+This method is executed when the API starts.
+
+**Possible errors:** ```LOCATION_PERMISSION_ERROR```, ```LOCATION_DISABLED``` and ```SENSOR_ERROR```
+
+---
+
+#### `onShaking()`
+
+```java
+shakingAPI.onShaking(errors);
+```
+This method is executed when a shaking event is detected.
+
+**Possible errors:** ```LOCATION_PERMISSION_ERROR``` and ```LOCATION_DISABLED```
+
+---
+
+#### `onResult()`
+
+```java
+shakingAPI.onResult(result, errors);
+```
+This method is executed when the API returns a result.
+***Note:*** The result might be an empty ArrayList.
+
+**Possible errors:** ```SERVER_ERROR```, ```AUTHENTICATION_ERROR```, ```API_KEY_EXPIRED```
+
+---
+
+
+#### `setLocation()`
+
+```java
+shakingAPI.setLocation(location);
+```
+or
+```java
+shakingAPI.setLocation(latitude, longitude);
+```
+
+Setting the location manually will disable using the device location.
+
+**Parameters:**
+
+| Name        | Type     | Default  |
+| ----------- | -------- | -------- |
+| location    | Location | Device current value |
+| latitude    | double   | Device current value|
+| longitude   | double   | Device current value|
 
 ---
 
 #### `setSensibility()`
 
 ```java
-api.setSensibility(sensibility);
+shakingConfig.setSensibility(sensibility);
 ```
 
 Sets the sensibility for the shaking event to be triggered.
@@ -170,10 +214,11 @@ Sets the sensibility for the shaking event to be triggered.
 #### `setDistanceFilter()`
 
 ```java
-api.setDistanceFilter(distanceFilter);
+shakingConfig.setDistanceFilter(distanceFilter);
 ```
 
 Sets the maximum distance (in meters) between two devices to be eligible for pairing.
+***Note:*** Only used in the online mode.
 
 **Parameters:**
 
@@ -187,7 +232,7 @@ Sets the maximum distance (in meters) between two devices to be eligible for pai
 #### `setTimingFilter()`
 
 ```java
-api.setTimingFilter(timingFilter);
+shakingConfig.setTimingFilter(timingFilter);
 ```
 
 Sets the maximum time difference (in milliseconds) between two shaking events to be eligible for pairing.
@@ -203,7 +248,7 @@ Sets the maximum time difference (in milliseconds) between two shaking events to
 #### `setKeepSearching()`
 
 ```java
-api.setKeepSearching(keepSearching);
+shakingConfig.setKeepSearching(keepSearching);
 ```
 
 A positive value would allow to keep searching even though if a user has been found. This could allow to pair with multiple devices. The response time will be affected by the timingFilter value.
@@ -216,58 +261,61 @@ A positive value would allow to keep searching even though if a user has been fo
 
 ---
 
-
-#### `setLocation()`
+#### `setUserId()`
 
 ```java
-api.setLocation(location);
-```
-or
-```java
-api.setLocation(latitude, longitude);
+shakingConfig.setUserId(userId);
 ```
 
-Setting the location manually will disable using the device location.
+Sets the user identifier.
 
 **Parameters:**
 
-| Name        | Type     | Default  |
+| Name        | Type     | Description|
 | ----------- | -------- | -------- |
-| location    | Location | Device current value |
-| latitude    | double   | Device current value|
-| longitude   | double   | Device current value|
+| userId| String| Unique user identifier in the context of the app (255 characters max)|
 
 ---
 
-#### `isLocationEnabled()`
+#### `setOnline()`
 
 ```java
-api.isLocationEnabled();
+shakingConfig.setOnline(onlineEnabled);
 ```
 
-Returns true if the device location is enabled, otherwise false.
+Enables or disable the online connection.
+
+**Parameters:**
+
+| Name        | Type     | Default|
+| ----------- | -------- | -------- |
+| onlineEnabled| boolean| true|
+
+#### `setConnectOnlyWith()`
+
+```java
+shakingConfig.setConnectOnlyWith(users);
+```
+
+Allows to connect only with a set of users. This can be useful in processes verification.
+
+**Parameters:**
+
+| Name        | Type     | Default|
+| ----------- | -------- | -------- |
+| users| ArrayList<String>| Empty|
 
 ---
 
-
-Intents
+Error codes
 ------------
 
-| Action                   | Extras                         | Description|
-| ---------------------    | ------------------------------ | -------- |
-| SHAKING                  | -                              | Shaking event triggered |
-| MATCHED                  | ```ArrayList<String> result``` | Match with 1 or more users|
-| NOT_MATCHED              | -                              | Not matched|
-| LOCATION_PERMISSION_ERROR| -                              | Location permission has not been accepted|
-| LOCATION_DISABLED        | -                              | Location is disabled|
-| SENSOR_ERROR             | -                              | The sensor devices are not available |
-| AUTHENTICATION_ERROR     | -                              | API key invalid|
-| API_KEY_EXPIRED          | -                              | API key expired|
-| SERVER_ERROR             | -                              | Server is not available|
+| Name                   | Description|
+| ---------------------    | -------- |
+| LOCATION_PERMISSION_ERROR| Location permission has not been accepted|
+| LOCATION_DISABLED        |  Location is disabled|
+| SENSOR_ERROR             |  The sensor devices are not available |
+| AUTHENTICATION_ERROR     | API key invalid|
+| API_KEY_EXPIRED          | API key expired|
+| SERVER_ERROR             | Server is not available|
 
-The only necessary action in the purpose of this library is MATCHED. The others are optional but we recommend to handle them.
-
-
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

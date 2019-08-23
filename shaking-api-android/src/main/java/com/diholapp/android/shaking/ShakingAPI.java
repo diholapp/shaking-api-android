@@ -1,69 +1,50 @@
 package com.diholapp.android.shaking;
 
+import android.os.Handler;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.diholapp.android.shaking.server.ServerRequestConnect;
+import com.diholapp.android.shaking.server.ServerResponse;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
+public class ShakingAPI implements ShakingAPIInterface {
 
-public class ShakingAPI implements AsyncResponse {
-
-    private final String API_KEY;
-
-    private String user;
-
-    private double lat;
-    private double lng;
-
-    private double sensibility = 25;
-    private int distanceFilter = 100;
-    private int timingFilter = 2000;
-
-    private boolean keepSearching = false;
+    private Status mStatus;
+    private ShakingConfig mConfig;
+    private Geolocator mGeolocator;
+    private Accelerometer mAccelerometer;
+    private ServerRequestConnect mServerRequestConnect;
+    private ArrayList<ShakingCodes> errors = new ArrayList<>();
 
     private final Context mContext;
 
-    private Accelerometer mAccelerometer;
+    private String idRequest;
 
-    private LocationManager mLocationManager;
-    private LocationListener mLocationListener;
+    public ShakingAPI(ShakingConfig config, Context context){
 
-    private boolean stopped = true;
-    private boolean paused = false;
-    private boolean processing = false;
-    private boolean manualLocation = false;
-
-    public ShakingAPI(String user, String API_KEY, Context context){
-
-        this.user = user;
-        this.API_KEY = API_KEY;
+        this.mConfig = config;
         this.mContext = context;
 
-        this.mAccelerometer = new Accelerometer(this);
+        this.mStatus = new Status();
 
-        configLocationListener();
+        this.mGeolocator = new Geolocator(this);
+        this.mAccelerometer = new Accelerometer(this);
     }
 
     public ShakingAPI start(){
 
-        if(stopped){
-            stopped = false;
-            paused = false;
-            if(!manualLocation) registerLocationListener();
-            mAccelerometer.startUpdates();
+        if(mStatus.start()){
+
+            mAccelerometer.start();
+
+            if(!mConfig.isLocationManual()) {
+                mGeolocator.start();
+            }
+
+            executeCallback("init");
         }
 
         return this;
@@ -71,11 +52,10 @@ public class ShakingAPI implements AsyncResponse {
 
     public ShakingAPI stop(){
 
-        if(!stopped){
-            stopped = true;
-            paused = false;
-            unregisterLocationListener();
-            mAccelerometer.stopUpdates();
+        if(mStatus.stop()){
+            mGeolocator.stop();
+            mAccelerometer.stop();
+            cancelServerRequest();
         }
 
         return this;
@@ -83,290 +63,191 @@ public class ShakingAPI implements AsyncResponse {
 
     private void restart(){
 
-        if(!stopped && !processing && paused){
-            paused = false;
-            if(!manualLocation) registerLocationListener();
-            mAccelerometer.startUpdates();
+        if(mStatus.restart()){
+            mServerRequestConnect = null;
+            mAccelerometer.start();
+            if(!mConfig.isLocationManual()) mGeolocator.start();
         }
 
     }
 
     private void pause(){
 
-        if(!paused){
-            paused = true;
-            unregisterLocationListener();
-            mAccelerometer.stopUpdates();
+        if(mStatus.pause()){
+            mGeolocator.stop();
+            mAccelerometer.stop();
         }
     }
 
     public void simulate(){
-        new HTTPAsyncTask(this).execute();
+        mAccelerometer.onShakingEvent();
     }
 
-    public void sendBroadcast(String s) {
-        mContext.sendBroadcast(new Intent(s));
+    private void executeCallback(String callback) {
+        if(callback.equals("init")) onInit(errors);
+        else if (callback.equals("shaking")) onShaking(errors);
+        errors = new ArrayList<>();
     }
 
-    @Override
-    public void onShakingEvent(){
+    private void executeCallback(String callback, ArrayList result) {
+        if(callback.equals("result")) onResult(result, errors);
+        errors = new ArrayList<>();
+    }
 
-        if(!isLocationEnabled()){
-            sendBroadcast(ShakingIntents.LOCATION_DISABLED);
+    void onShakingEvent(){
+
+        updateRequestId();
+
+        if(!mGeolocator.isLocationEnabled()){
+            addError(ShakingCodes.LOCATION_DISABLED);
         }
 
-        processing = true;
-        pause();
+        mStatus.setProcessing(true);
 
-        sendBroadcast(ShakingIntents.SHAKING);
-        new HTTPAsyncTask(this).execute();
+        pause();
+        executeCallback("shaking");
+
+        decideResult();
     }
 
-    @Override
-    public void processFinish(String output){
+    private void updateRequestId(){
+        int length = 10;
+        String AB = "0123456789abcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for( int i = 0; i < length; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        idRequest = sb.toString();
+    }
 
-        Intent intent = new Intent();
+    private void decideResult(){
 
+        if(mServerRequestConnect == null){
+
+            mServerRequestConnect = new ServerRequestConnect(this);
+            mServerRequestConnect.execute();
+
+        }
+
+    }
+
+    void onResponseProcessed(ArrayList result){
+
+        if(!isRunning() || !isProcessing()) return;
+
+        mStatus.setProcessing(false);
+
+        executeCallback("result", result);
+        restart();
+    }
+
+    public void processServerResponse(ServerResponse serverResponse){
+
+        if(!isRunning()) return;
+
+        boolean invalidKey = false;
         boolean serverError = false;
+        ArrayList<String> result = new ArrayList<>();
 
         try {
-            ArrayList<String> response = processJsonResponse(output);
-
-            if(response.size() > 0){
-                intent.setAction(ShakingIntents.MATCHED);
-                intent.putExtra("result", response);
-            }
-            else {
-                intent.setAction(ShakingIntents.NOT_MATCHED);
-            }
-
+            result = serverResponse.getArrayFromResponse();
         }
         catch (Exception e){
 
             if ("401".equals(e.getMessage())) {
-                intent.setAction(ShakingIntents.AUTHENTICATION_ERROR);
+                invalidKey = true;
+                addError(ShakingCodes.AUTHENTICATION_ERROR);
             }
             else if ("403".equals(e.getMessage())){
-                intent.setAction(ShakingIntents.API_KEY_EXPIRED);
+                invalidKey = true;
+                addError(ShakingCodes.API_KEY_EXPIRED);
             }
             else {
-                intent.setAction(ShakingIntents.SERVER_ERROR);
-                serverError = true;
-            }
-        }
-
-        mContext.sendBroadcast(intent);
-
-        if(serverError){
-            // Avoids overlapping in case of no
-            // internet connection
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {}
-        }
-
-        processing = false;
-        restart();
-    }
-
-    private ArrayList<String> processJsonResponse(String jsonString) throws Exception{
-
-        Object obj = new JSONParser().parse(jsonString);
-
-        // typecasting obj to JSONObject
-        JSONObject jo = (JSONObject) obj;
-
-        // getting address
-        Map status = ((Map)jo.get("status"));
-
-        // iterating address Map
-        Iterator<Map.Entry> itr1 = status.entrySet().iterator();
-        while (itr1.hasNext()) {
-            Map.Entry pair = itr1.next();
-
-            String key = pair.getKey().toString();
-
-            if(key.equals("code")) {
-                String value = pair.getValue().toString();
-                if (!value.equals("200")){
-                    throw new Exception(value);
+                if(mConfig.isOnlineEnabled()){
+                    serverError = true;
+                    addError(ShakingCodes.SERVER_ERROR);
                 }
             }
         }
 
-        JSONArray jArray = (JSONArray) jo.get("response");
+        ArrayList<String> finalResult = new ArrayList<>(result);
 
-        ArrayList<String> result = new ArrayList<>();
-        if (jArray != null) {
-            for (int i=0;i<jArray.size();i++){
-                result.add(jArray.get(i).toString());
-            }
-        }
-
-        return result;
+        // Avoids overlapping in case of no internet connection
+        Handler handler = new Handler();
+        handler.postDelayed(() -> onResponseProcessed(finalResult), serverError ? 2000 : 0);
     }
 
-    private boolean checkLocationPermission(){
-        return (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED);
-    }
-
-    private Location getLastKnownLocation(){
-        Location lastKnownLocationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Location lastKnownLocationNetwork = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        return GPSLocation.getBestLocation(lastKnownLocationGPS, lastKnownLocationNetwork);
-    }
-
-    private void configLocationListener(){
-
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-
-        if(checkLocationPermission()){
-            updateLocation(getLastKnownLocation());
-        }
-
-        mLocationListener = new LocationListener() {
-
-            public void onLocationChanged(Location location) {
-
-                Location bestLocation = GPSLocation.getBestLocation(location,  getLastKnownLocation());
-                updateLocation(bestLocation);
-
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            public void onProviderEnabled(String provider) {}
-
-            public void onProviderDisabled(String provider) {}
-        };
-
-    }
-
-    /**
-     * Register for location updates if location permissions
-     * have been accepted. Sends a broadcast if not.
-     */
-    private void registerLocationListener(){
-
-        if(checkLocationPermission()){
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
-        }
-        else {
-            sendBroadcast(ShakingIntents.LOCATION_PERMISSION_ERROR);
+    void cancelServerRequest(){
+        if(mServerRequestConnect != null){
+            mServerRequestConnect.cancel(true);
+            mServerRequestConnect = null;
         }
     }
 
-    private void unregisterLocationListener(){
-        mLocationManager.removeUpdates(mLocationListener);
-    }
-
-    public boolean isLocationEnabled(){
-        boolean gpsEnabled = false;
-        boolean networkEnabled = false;
-
-        try {
-            gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
-
-        try {
-            networkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
-
-        if(!gpsEnabled && !networkEnabled) {
-            return false;
+    void addError(ShakingCodes err){
+        if(!errors.contains(err)){
+            errors.add(err);
         }
-
-        return true;
     }
 
-    public Context getContext(){
-        return mContext;
+    public String getIdRequest(){
+        return idRequest;
     }
 
-    public double getLat(){
-        return lat;
-    }
-
-    public double getLng(){
-        return lng;
-    }
 
     public ShakingAPI setLocation(double lat, double lng){
-        this.lat = lat;
-        this.lng = lng;
-        manualLocation = true;
+
+        Location location = new Location("");
+        location.setLatitude(lat);
+        location.setLongitude(lng);
+
+        mConfig.setManualLocation(true);
+        mGeolocator.setLocation(location);
 
         return this;
     }
 
     public ShakingAPI setLocation(Location location){
-        if(location != null) {
-            this.lat = location.getLatitude();
-            this.lng = location.getLongitude();
-        }
-        manualLocation = true;
+        mGeolocator.setLocation(location);
+        mConfig.setManualLocation(true);
 
         return this;
     }
 
-
-    public void updateLocation(Location location){
-        if(!manualLocation && location != null) {
-            this.lat = location.getLatitude();
-            this.lng = location.getLongitude();
-        }
-    }
-
-    public String getApiKey(){
-        return API_KEY;
-    }
-
-    public ShakingAPI setUser(String user){
-        this.user = user;
+    public ShakingAPI setConfig(ShakingConfig config){
+        mConfig = config;
         return this;
     }
 
-    public String getUser(){
-        return user;
+    public ShakingConfig getConfig(){
+        return mConfig;
+    }
+    public boolean isRunning() { return !mStatus.isStopped(); }
+    public boolean isProcessing() { return mStatus.isProcessing(); }
+
+    Context getContext(){
+        return mContext;
     }
 
-    public ShakingAPI setTimingFilter(int timingFilter){
-        this.timingFilter = timingFilter;
-        return this;
+    public String getUserId(){
+        return mConfig.getUserId();
+    }
+    public Location getLocation(){
+        return mGeolocator.getLocation();
     }
 
-    public int getTimingFilter(){
-        return timingFilter;
+    @Override
+    public void onInit(ArrayList<ShakingCodes> errors) {
+
     }
 
-    public ShakingAPI setDistanceFilter(int distanceFilter){
-        this.distanceFilter = distanceFilter;
-        return this;
+    @Override
+    public void onResult(ArrayList<String> result, ArrayList<ShakingCodes> errors) {
+
     }
 
-    public int getDistanceFilter(){
-        return distanceFilter;
-    }
+    @Override
+    public void onShaking(ArrayList<ShakingCodes> errors) {
 
-    public ShakingAPI setKeepSearching(boolean keepSearching){
-        this.keepSearching = keepSearching;
-        return this;
     }
-
-    public boolean getKeepSearching(){
-        return keepSearching;
-    }
-
-    public ShakingAPI setSensibility(double sensibility){
-        this.sensibility = sensibility;
-        return this;
-    }
-
-    public double getSensibility(){
-        return sensibility;
-    }
-
 }
