@@ -24,9 +24,9 @@ Add the following dependency in your app's ```build.gradle```:
 implementation 'com.diholapp.shaking:shaking-api-android:0.5.2'
 ```
 
-***Note:*** We recommend that you don't use ```implementation 'com.diholapp.shaking:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
+**Note:** We recommend that you don't use ```implementation 'com.diholapp.shaking:shaking-api-android:+'```, as future versions may not maintain full backwards compatibility.
 
-***Note:*** This library requires Java 1.8.
+**Note:** This library requires Java 1.8.
 
 ```gradle
 android {
@@ -42,13 +42,14 @@ Permissions
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.RECORD_AUDIO"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
 
 Usage
 -------
+
+Get your API key at www.diholapp.com and start connecting.
 
 ```java
 import com.diholapp.android.shaking.ShakingAPI;
@@ -89,6 +90,7 @@ Methods
 * [`onInit`](#oninit)
 * [`onShaking`](#onshaking)
 * [`onResult`](#onresult)
+* [`setLocation`](#setlocation)
 * [`isRunning`](#isrunning)
 * [`setConfig`](#setconfig)
 * [`getConfig`](#getconfig)
@@ -193,6 +195,40 @@ Setting the location manually will disable using the device location.
 | longitude   | double   | Device current value|
 
 ---
+
+#### `isRunning()`
+
+```java
+shakingAPI.isRunning();
+```
+Returns true if the API is running, otherwise false.
+
+---
+
+#### `setConfig()`
+
+```java
+shakingAPI.setConfig(config);
+```
+
+**Parameters:**
+
+| Name        | Type     | 
+| ----------- | -------- | 
+| config    | ShakingConfig | 
+
+---
+
+#### `getConfig()`
+
+```java
+shakingAPI.setConfig(config);
+```
+
+Returns the ShakingConfig object.
+
+---
+
 
 #### `setSensibility()`
 
